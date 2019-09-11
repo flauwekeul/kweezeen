@@ -1,17 +1,17 @@
 <template>
-  <form novalidate @submit.prevent>
+  <form novalidate @submit.prevent="saveRecipe">
     <label>
       Title
-      <input type="text" v-model="form.title">
+      <input type="text" v-model="recipe.title">
     </label>
     <label>
       Ingredients
       <ul>
-        <li v-for="(ingredient, i) in form.ingredients" :key="i">
+        <li v-for="(ingredient, i) in recipe.ingredients" :key="i">
           <input
             type="text"
             ref="ingredientInputs"
-            v-model="form.ingredients[i]"
+            v-model="recipe.ingredients[i]"
             @keyup.enter="addIngredient(i)"
             @keydown.backspace="removeIngredient($event, i)">
         </li>
@@ -20,24 +20,27 @@
     <label>
       Steps
       <ul>
-        <li v-for="(step, i) in form.steps" :key="i">
+        <li v-for="(step, i) in recipe.steps" :key="i">
           <input
             type="text"
             ref="stepInputs"
-            v-model="form.steps[i]"
+            v-model="recipe.steps[i]"
             @keyup.enter="addStep(i)"
             @keydown.backspace="removeStep($event, i)">
         </li>
       </ul>
     </label>
+    <button type="submit">Save</button>
   </form>
 </template>
 
 <script>
+import db from '@/db';
+
 export default {
   data() {
     return {
-      form: {
+      recipe: {
         title: null,
         ingredients: [null],
         steps: [null],
@@ -46,7 +49,7 @@ export default {
   },
   methods: {
     addIngredient(i) {
-      this.form.ingredients.push(null)
+      this.recipe.ingredients.push(null)
       // refs aren't updated immediately
       this.$nextTick(() => {
         // focus the just created empty input
@@ -54,14 +57,14 @@ export default {
       })
     },
     removeIngredient($event, i) {
-      if (!this.form.ingredients[i] && this.form.ingredients.length > 1) {
+      if (!this.recipe.ingredients[i] && this.recipe.ingredients.length > 1) {
         $event.preventDefault()
-        this.form.ingredients.splice(i, 1)
+        this.recipe.ingredients.splice(i, 1)
         this.$refs.ingredientInputs[i - 1].focus()
       }
     },
     addStep(i) {
-      this.form.steps.push(null)
+      this.recipe.steps.push(null)
       // refs aren't updated immediately
       this.$nextTick(() => {
         // focus the just created empty input
@@ -69,11 +72,14 @@ export default {
       })
     },
     removeStep($event, i) {
-      if (!this.form.steps[i] && this.form.steps.length > 1) {
+      if (!this.recipe.steps[i] && this.recipe.steps.length > 1) {
         $event.preventDefault()
-        this.form.steps.splice(i, 1)
+        this.recipe.steps.splice(i, 1)
         this.$refs.stepInputs[i - 1].focus()
       }
+    },
+    saveRecipe() {
+      db.collection('recipes').add(this.recipe)
     }
   }
 };

@@ -8,12 +8,13 @@
       Ingredients
       <ul>
         <li v-for="(ingredient, i) in recipe.ingredients" :key="i">
-          <input
-            type="text"
+          <ingredient-input
             ref="ingredientInputs"
             v-model="recipe.ingredients[i]"
-            @keyup.enter="addIngredient(i)"
-            @keydown.backspace="removeIngredient($event, i)">
+            @save="addIngredient(i)"
+            @remove="removeIngredient(i)">
+          </ingredient-input>
+          {{ recipe.ingredients[i] }}
         </li>
       </ul>
     </label>
@@ -36,35 +37,38 @@
 
 <script>
 import db from '@/db';
+import IngredientInput from '@/components/IngredientInput.vue';
 
 export default {
+  components: {
+    IngredientInput
+  },
   data() {
     return {
       recipe: {
-        title: null,
-        ingredients: [null],
-        steps: [null],
+        title: '',
+        ingredients: [{}],
+        steps: [''],
       },
     }
   },
   methods: {
     addIngredient(i) {
-      this.recipe.ingredients.push(null)
+      this.recipe.ingredients.push({})
       // refs aren't updated immediately
       this.$nextTick(() => {
         // focus the just created empty input
         this.$refs.ingredientInputs[i + 1].focus()
       })
     },
-    removeIngredient($event, i) {
-      if (!this.recipe.ingredients[i] && this.recipe.ingredients.length > 1) {
-        $event.preventDefault()
+    removeIngredient(i) {
+      if (this.recipe.ingredients.length > 1) {
         this.recipe.ingredients.splice(i, 1)
         this.$refs.ingredientInputs[i - 1].focus()
       }
     },
     addStep(i) {
-      this.recipe.steps.push(null)
+      this.recipe.steps.push('')
       // refs aren't updated immediately
       this.$nextTick(() => {
         // focus the just created empty input

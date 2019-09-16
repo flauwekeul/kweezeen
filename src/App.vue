@@ -1,6 +1,19 @@
 <template>
-  <router-view />
+  <main>
+    <app-header></app-header>
+    <router-view />
+  </main>
 </template>
+
+<script>
+import Header from './components/Header.vue'
+
+export default {
+  components: {
+    appHeader: Header,
+  },
+}
+</script>
 
 <style lang="scss">
 body {

@@ -2,7 +2,7 @@
   <form novalidate @submit.prevent="saveRecipe">
     <label>
       Title
-      <input type="text" v-model="recipe.title">
+      <input type="text" v-model="recipe.title" />
     </label>
     <label>
       Ingredients
@@ -12,7 +12,8 @@
             ref="ingredientInputs"
             v-model="recipe.ingredients[i]"
             @save="addIngredient(i)"
-            @remove="removeIngredient(i)">
+            @remove="removeIngredient(i)"
+          >
           </ingredient-input>
           {{ recipe.ingredients[i] }}
         </li>
@@ -20,29 +21,31 @@
     </label>
     <label>
       Steps
-      <ul>
+      <ol>
         <li v-for="(step, i) in recipe.steps" :key="i">
           <input
             type="text"
             ref="stepInputs"
             v-model="recipe.steps[i]"
             @keyup.enter="addStep(i)"
-            @keydown.backspace="removeStep($event, i)">
+            @keydown.backspace="removeStep($event, i)"
+          />
         </li>
-      </ul>
+      </ol>
     </label>
     <button type="submit">Save</button>
   </form>
 </template>
 
 <script>
-import db from '@/db';
-import IngredientInput from '@/components/IngredientInput.vue';
+import db from '@/db'
+import IngredientInput from '@/components/IngredientInput.vue'
 
 export default {
   components: {
-    IngredientInput
+    IngredientInput,
   },
+  props: ['id'],
   data() {
     return {
       recipe: {
@@ -50,6 +53,11 @@ export default {
         ingredients: [{}],
         steps: [''],
       },
+    }
+  },
+  created() {
+    if (this.id) {
+      this.$bind('recipe', db.collection('recipes').doc(this.id))
     }
   },
   methods: {
@@ -83,8 +91,16 @@ export default {
       }
     },
     saveRecipe() {
-      db.collection('recipes').add(this.recipe)
-    }
-  }
-};
+      if (this.id) {
+        db.collection('recipes').set(this.recipe)
+      } else {
+        db.collection('recipes')
+          .add(this.recipe)
+          .then(({ id }) => {
+            this.$router.replace({ name: 'update-recipe', params: { id } })
+          })
+      }
+    },
+  },
+}
 </script>

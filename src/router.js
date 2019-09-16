@@ -9,13 +9,22 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: 'add-recipe',
+      name: 'home',
+      component: () => import('./views/Home.vue'),
     },
     {
-      path: '/add-recipe',
-      name: 'add-recipe',
-      component: () =>
-        import(/* webpackChunkName: "add-recipe" */ './views/AddRecipe.vue'),
+      path: '/recipe',
+      name: 'recipe',
+      component: () => import('./views/Recipe.vue'),
+      props: true,
+      children: [
+        {
+          path: ':id',
+          name: 'update-recipe',
+          component: () => import('./views/Recipe.vue'),
+        },
+      ],
     },
+    { path: '*', redirect: '/' },
   ],
 })

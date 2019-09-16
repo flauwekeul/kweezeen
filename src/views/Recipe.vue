@@ -27,6 +27,7 @@
             type="text"
             ref="stepInputs"
             v-model="recipe.steps[i]"
+            @keydown.enter.prevent
             @keyup.enter="addStep(i)"
             @keydown.backspace="removeStep($event, i)"
           />
@@ -40,6 +41,8 @@
 <script>
 import db from '@/db'
 import IngredientInput from '@/components/IngredientInput.vue'
+
+const recipes = db.collection('recipes')
 
 export default {
   components: {
@@ -57,7 +60,7 @@ export default {
   },
   created() {
     if (this.id) {
-      this.$bind('recipe', db.collection('recipes').doc(this.id))
+      this.$bind('recipe', recipes.doc(this.id))
     }
   },
   methods: {
@@ -92,13 +95,11 @@ export default {
     },
     saveRecipe() {
       if (this.id) {
-        db.collection('recipes').set(this.recipe)
+        recipes.doc(this.id).update(JSON.parse(JSON.stringify(this.recipe)))
       } else {
-        db.collection('recipes')
-          .add(this.recipe)
-          .then(({ id }) => {
-            this.$router.replace({ name: 'update-recipe', params: { id } })
-          })
+        recipes.add(this.recipe).then(({ id }) => {
+          this.$router.replace({ name: 'update-recipe', params: { id } })
+        })
       }
     },
   },

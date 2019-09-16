@@ -1,7 +1,9 @@
 <template>
   <ol>
     <li v-for="(recipe, i) in recipes" :key="i">
-      {{ recipe.title }}
+      <router-link :to="{ name: 'update-recipe', params: { id: recipe.id } }">
+        {{ recipe }}
+      </router-link>
     </li>
   </ol>
 </template>
@@ -15,7 +17,7 @@ export default {
       recipes: [],
     }
   },
-  firebase: {
+  firestore: {
     recipes: db.collection('recipes'),
   },
 }

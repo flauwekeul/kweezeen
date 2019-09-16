@@ -4,23 +4,30 @@
     ref="input"
     :value="value.value"
     @input="input"
+    @keydown.enter.prevent
     @keyup.enter="save"
-    @keyup.backspace="removeIfEmpty">
+    @keyup.backspace="removeIfEmpty"
+  />
 </template>
 
 <script>
-const AMOUNT_PATTERN =  /(\d+)?/
+const AMOUNT_PATTERN = /(\d+)?/
 // todo: add more units and map them to enum
-const UNIT_PATTERN =  /(gram|g)?\b/
-const NAME_PATTERN =  /(.+)?/
-const WHITESPACE_PATTERN =  /\s*/
-const INGREDIENT_PATTERN = new RegExp([
-  AMOUNT_PATTERN,
-  WHITESPACE_PATTERN,
-  UNIT_PATTERN,
-  WHITESPACE_PATTERN,
-  NAME_PATTERN
-].map(pattern => pattern.source).join(''), 'i')
+const UNIT_PATTERN = /(gram|g)?\b/
+const NAME_PATTERN = /(.+)?/
+const WHITESPACE_PATTERN = /\s*/
+const INGREDIENT_PATTERN = new RegExp(
+  [
+    AMOUNT_PATTERN,
+    WHITESPACE_PATTERN,
+    UNIT_PATTERN,
+    WHITESPACE_PATTERN,
+    NAME_PATTERN,
+  ]
+    .map(pattern => pattern.source)
+    .join(''),
+  'i',
+)
 
 export default {
   name: 'ingredient-input',
@@ -30,7 +37,7 @@ export default {
       amount: Number,
       unit: String,
       name: String,
-    }
+    },
   },
   methods: {
     input($event) {
@@ -48,13 +55,13 @@ export default {
       this.$emit('save')
     },
     removeIfEmpty($event) {
-      if(!$event.target.value) {
+      if (!$event.target.value) {
         this.$emit('remove')
       }
     },
     focus() {
       this.$refs.input.focus()
-    }
-  }
+    },
+  },
 }
 </script>
